@@ -1,6 +1,7 @@
 package trace
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/uber/jaeger-client-go"
@@ -55,29 +56,29 @@ func (m *Tracer) StartServerSpanFromContext(ctx *gin.Context, name string, opts 
 	return sp, nil
 }
 
-//func (m *Tracer) StartGRpcClientSpanFromContext(ctx context.Context, name string, opts ...opentracing.StartSpanOption) (context.Context, opentracing.Span, error) {
-//	if parentSpan := opentracing.SpanFromContext(ctx); parentSpan != nil {
-//		opts = append(opts, opentracing.ChildOf(parentSpan.Context()))
-//	}
-//	sp := m.tracer.StartSpan(name, opts...)
-//	//ctx = withTraceId(ctx, sp)
-//	ext.SpanKindRPCClient.Set(sp)
-//	ext.Component.Set(sp, "grpc")
-//	md, ok := metadata.FromOutgoingContext(ctx)
-//	if !ok {
-//		md = metadata.New(nil)
-//	} else {
-//		md = md.Copy()
-//	}
-//	mdWriter := metadataReaderWriter{md}
-//	err := m.tracer.Inject(sp.Context(), opentracing.TextMap, mdWriter)
-//	if err != nil {
-//		return nil, nil, err
-//	}
-//	ctx = metadata.NewOutgoingContext(ctx, md)
-//	return ctx, sp, nil
-//}
-//
+func (m *Tracer) StartGRpcClientSpanFromContext(ctx context.Context, name string, opts ...opentracing.StartSpanOption) (context.Context, opentracing.Span, error) {
+	if parentSpan := opentracing.SpanFromContext(ctx); parentSpan != nil {
+		opts = append(opts, opentracing.ChildOf(parentSpan.Context()))
+	}
+	sp := m.tracer.StartSpan(name, opts...)
+	//ctx = withTraceId(ctx, sp)
+	ext.SpanKindRPCClient.Set(sp)
+	ext.Component.Set(sp, "grpc")
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = metadata.New(nil)
+	} else {
+		md = md.Copy()
+	}
+	mdWriter := metadataReaderWriter{md}
+	err := m.tracer.Inject(sp.Context(), opentracing.TextMap, mdWriter)
+	if err != nil {
+		return nil, nil, err
+	}
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	return ctx, sp, nil
+}
+
 //func (m *Tracer) StartHttpClientSpanFromContext(ctx context.Context, name string, opts ...opentracing.StartSpanOption) (context.Context, opentracing.Span, error) {
 //	if parentSpan := opentracing.SpanFromContext(ctx); parentSpan != nil {
 //		opts = append(opts, opentracing.ChildOf(parentSpan.Context()))

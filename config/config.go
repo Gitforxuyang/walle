@@ -57,6 +57,7 @@ type EvaConfig struct {
 var (
 	config     *EvaConfig
 	configOnce sync.Once
+	etcdClient *clientv3.Client
 )
 
 func Init() {
@@ -98,6 +99,7 @@ func Init() {
 			DialTimeout: time.Second * 3,
 		})
 		utils.Must(err)
+		etcdClient = client
 		resp, err := client.Get(context.TODO(), fmt.Sprintf("%s%s", ETCD_CONFIG_PREFIX, "global"))
 		utils.Must(err)
 		if len(resp.Kvs) == 0 {
@@ -133,10 +135,12 @@ func Init() {
 }
 
 func GetConfig() *EvaConfig {
-
 	return config
 }
 
+func GetEtcdClient() *clientv3.Client {
+	return etcdClient
+}
 func RegisterNotify(f ChangeNotify) {
 	config.changeNotifyFuncs = append(config.changeNotifyFuncs, f)
 }
