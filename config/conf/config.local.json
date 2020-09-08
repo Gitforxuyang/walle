@@ -1,9 +1,0 @@
-
-{
-  "name": "demo-local",
-  "mongo": {
-    "node": {
-      "url": "node local url"
-    }
-  }
-}

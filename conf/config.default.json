@@ -1,0 +1,10 @@
+
+{
+  "name": "walle",
+  "port": 8080,
+  "log": {
+    "server": true,
+    "grpcClient": true,
+    "httpClient": true
+  }
+}

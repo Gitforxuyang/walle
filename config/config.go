@@ -101,7 +101,7 @@ func Init() {
 		resp, err := client.Get(context.TODO(), fmt.Sprintf("%s%s", ETCD_CONFIG_PREFIX, "global"))
 		utils.Must(err)
 		if len(resp.Kvs) == 0 {
-			panic("配置中心未找到")
+			panic("配置中心global未找到")
 		}
 		v.MergeConfig(bytes.NewBuffer(resp.Kvs[0].Value))
 		resp, err = client.Get(context.TODO(), fmt.Sprintf("%s%s", ETCD_CONFIG_PREFIX, config.name))

@@ -8,34 +8,34 @@ import (
 
 var (
 	UnknowError = EvaError{
+		AppId:   "walle",
 		Code:    1001,
 		Message: "未知错误",
 		Status:  codes.Unknown,
 	}
 	PanicError = EvaError{
+		AppId:   "walle",
 		Code:    1002,
 		Message: "异常错误",
 		Status:  codes.Unknown,
 	}
 	HttpError = EvaError{
+		AppId:   "walle",
 		Code:    2001,
 		Message: "http错误",
 		Status:  codes.Internal,
 	}
 	TypeError = EvaError{
+		AppId:   "walle",
 		Code:    3001,
 		Message: "类型转换错误",
 		Status:  codes.Internal,
 	}
 	ContextDieError = EvaError{
+		AppId:   "walle",
 		Code:    4001,
 		Message: "context已到期",
 		Status:  codes.DeadlineExceeded,
-	}
-	RedisError = EvaError{
-		Code:    5001,
-		Message: "redis发生异常",
-		Status:  codes.Internal,
 	}
 )
 
@@ -55,10 +55,6 @@ func (m EvaError) SetCode(code int32) EvaError {
 	m.Code = code
 	return m
 }
-func (m EvaError) SetAppId(v string) EvaError {
-	m.AppId = v
-	return m
-}
 func (m EvaError) SetMessage(msg string) EvaError {
 	m.Message = msg
 	return m
@@ -68,9 +64,9 @@ func (e EvaError) Error() string {
 	return string(b)
 }
 
-func New(appId, message, detail string, code int32, status codes.Code) error {
+func New(message, detail string, code int32, status codes.Code) error {
 	return &EvaError{
-		AppId:   appId,
+		AppId:   "walle",
 		Code:    code,
 		Detail:  detail,
 		Message: message,

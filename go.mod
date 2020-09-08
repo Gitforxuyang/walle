@@ -9,8 +9,9 @@ require (
 	github.com/envoyproxy/go-control-plane v0.9.6 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.4.1 // indirect
 	github.com/fatih/structs v1.1.0
-	github.com/getsentry/sentry-go v0.7.0 // indirect
+	github.com/getsentry/sentry-go v0.7.0
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-errors/errors v1.0.1
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
@@ -24,7 +25,7 @@ require (
 	github.com/spf13/afero v1.3.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
-	github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77 // indirect
+	github.com/uber/jaeger-lib v2.2.0+incompatible // indirect
 	go.uber.org/zap v1.16.0
 	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73 // indirect
