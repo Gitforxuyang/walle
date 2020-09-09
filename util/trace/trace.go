@@ -52,13 +52,17 @@ func (m *Tracer) StartServerSpanFromContext(ctx *gin.Context, name string, opts 
 	ext.SpanKindRPCServer.Set(sp)
 	ext.Component.Set(sp, "http")
 	ext.HTTPMethod.Set(sp, ctx.Request.Method)
-	//ctx = opentracing.ContextWithSpan(ctx, sp)
+	ctx.Set("span", sp)
+	//opentracing.ContextWithSpan(ctx, sp)
 	return sp, nil
 }
 
 func (m *Tracer) StartGRpcClientSpanFromContext(ctx context.Context, name string, opts ...opentracing.StartSpanOption) (context.Context, opentracing.Span, error) {
-	if parentSpan := opentracing.SpanFromContext(ctx); parentSpan != nil {
-		opts = append(opts, opentracing.ChildOf(parentSpan.Context()))
+	if parentSpan := ctx.Value("span"); parentSpan != nil {
+		parent, ok := parentSpan.(opentracing.Span)
+		if ok {
+			opts = append(opts, opentracing.ChildOf(parent.Context()))
+		}
 	}
 	sp := m.tracer.StartSpan(name, opts...)
 	//ctx = withTraceId(ctx, sp)
@@ -77,6 +81,23 @@ func (m *Tracer) StartGRpcClientSpanFromContext(ctx context.Context, name string
 	}
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	return ctx, sp, nil
+}
+func (m *Tracer) InjectTraceToContext(ctx context.Context) (context.Context, error) {
+	parentSpan := ctx.Value("span")
+	parent, _ := parentSpan.(opentracing.Span)
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		md = metadata.New(nil)
+	} else {
+		md = md.Copy()
+	}
+	mdWriter := metadataReaderWriter{md}
+	err := m.tracer.Inject(parent.Context(), opentracing.TextMap, mdWriter)
+	if err != nil {
+		return nil, err
+	}
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	return ctx, nil
 }
 
 //func (m *Tracer) StartHttpClientSpanFromContext(ctx context.Context, name string, opts ...opentracing.StartSpanOption) (context.Context, opentracing.Span, error) {

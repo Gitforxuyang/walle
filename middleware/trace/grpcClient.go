@@ -37,7 +37,11 @@ func NewClientWrapper() func(ctx context.Context, method string, req, reply inte
 			}
 			return err
 		} else {
-			err := invoker(ctx, method, req, reply, cc, opts...)
+			ctx, err := tracer.InjectTraceToContext(ctx)
+			if err != nil {
+				logger.GetLogger().Error(ctx, "链路错误", logger.Fields{"err": utils.StructToMap(err)})
+			}
+			err = invoker(ctx, method, req, reply, cc, opts...)
 			return err
 		}
 	}
