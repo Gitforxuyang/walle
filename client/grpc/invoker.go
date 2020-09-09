@@ -83,7 +83,7 @@ func (p *Proxy) Invoke(ctx context.Context,
 func NewProxy(service string) *Proxy {
 	conn, err := grpc.Dial("",
 		grpc.WithInsecure(),
-		grpc.WithBlock(),
+		//grpc.WithBlock(),
 		grpc.WithBalancer(grpc.RoundRobin(etcd2.NewResolver(service))),
 		grpc.WithKeepaliveParams(
 			keepalive.ClientParameters{

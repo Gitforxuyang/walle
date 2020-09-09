@@ -7,6 +7,7 @@ import (
 	"github.com/Gitforxuyang/walle/middleware/catch"
 	"github.com/Gitforxuyang/walle/middleware/log"
 	"github.com/Gitforxuyang/walle/middleware/trace"
+	"github.com/Gitforxuyang/walle/registory/etcd"
 	"github.com/Gitforxuyang/walle/util/logger"
 	"github.com/Gitforxuyang/walle/util/utils"
 	"github.com/gin-gonic/gin"
@@ -63,9 +64,8 @@ func InitServer() {
 		Handler: r,
 	}
 	go func() {
-		err := srv.ListenAndServe()
+		srv.ListenAndServe()
 		time.Sleep(time.Millisecond * 500)
-		utils.Must(err)
 	}()
 	time.Sleep(time.Millisecond * 200)
 	logger.GetLogger().Info(context.TODO(), "server started", logger.Fields{
@@ -73,12 +73,15 @@ func InitServer() {
 		"server": config.GetConfig().GetName(),
 		"env":    config.GetConfig().GetENV(),
 	})
+	id := utils.GetUUIDStr()
+	etcd.Registry(conf.GetName(), fmt.Sprintf("%s:%d", utils.GetLocalIp(), conf.GetPort()), id)
 	c := make(chan os.Signal)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 	s := <-c
 	logger.GetLogger().Info(context.TODO(), "signal", logger.Fields{
 		"signal": s.String(),
 	})
+	etcd.UnRegistry(conf.GetName(), id)
 	srv.Shutdown(context.TODO())
 	//做一些资源关闭动作
 	for _, v := range shutdownFunc {

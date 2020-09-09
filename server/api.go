@@ -17,9 +17,14 @@ type apiController struct {
 }
 
 type method struct {
-	service string
-	method  string
-	plugins []string //需要通过哪几个插件
+	service string   `json:"service"`
+	method  string   `json:"method"`
+	plugins []plugin `json:"plugins"` //需要通过哪几个插件
+}
+
+type plugin struct {
+	name  string `json:"name"`
+	param string `json:"param"`
 }
 
 var (
@@ -51,7 +56,7 @@ func Api(ctx *gin.Context) (map[string]interface{}, error) {
 	req["realIp"] = ctx.Request.Header.Get("X-Real-IP")
 	//对需要经过的插件依次执行
 	for _, v := range method.plugins {
-		switch v {
+		switch v.name {
 		case "checkSSO":
 			uid, err := checkSSO(ctx, ctx.Request.Header.Get("token"))
 			if err != nil {
