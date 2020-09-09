@@ -39,10 +39,8 @@ func InitServer() {
 			req, _ := ctx.Get("req")
 			resp, err := Rpc(ctx, ctx.Param("Service"), ctx.Param("Method"), req)
 			if err != nil {
-				ctx.Set("status", 500)
 				ctx.Set("err", err)
 			} else {
-				ctx.Set("status", 200)
 				ctx.Set("resp", resp)
 			}
 		})
@@ -50,7 +48,16 @@ func InitServer() {
 	r.
 		Use(trace.ServerTrace()).
 		Use(log.ServerLogger()).
-		Use(catch.ServerCatch())
+		Use(catch.ServerCatch()).
+		Use(func(ctx *gin.Context) {
+			resp, err := Api(ctx)
+			if err != nil {
+				ctx.Set("err", err)
+			} else {
+				ctx.Set("resp", resp)
+			}
+		})
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", conf.GetPort()),
 		Handler: r,

@@ -75,7 +75,13 @@ func catch(ctx *gin.Context, log logger.EvaLogger) {
 		e, exists := ctx.Get("err")
 		if exists {
 			ee := error2.FromError(e.(error))
-			ctx.JSON(500, vo.Resp{Code: ee.Code, Message: ee.Message})
+			if ee.Code == 404 {
+				ctx.Set("status", 404)
+				ctx.JSON(404, vo.Resp{Code: ee.Code, Message: ee.Message})
+			} else {
+				ctx.Set("status", 500)
+				ctx.JSON(500, vo.Resp{Code: ee.Code, Message: ee.Message})
+			}
 		} else {
 			resp, exists := ctx.Get("resp")
 			if !exists {

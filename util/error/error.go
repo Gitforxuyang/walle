@@ -43,6 +43,12 @@ var (
 		Message: "内部错误",
 		Status:  codes.Internal,
 	}
+	NotFoundError = EvaError{
+		AppId:   "walle",
+		Code:    404,
+		Message: "未找到",
+		Status:  codes.NotFound,
+	}
 )
 
 type EvaError struct {

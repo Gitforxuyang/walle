@@ -17,5 +17,6 @@ func main() {
 	trace.Init(fmt.Sprintf("%s_%s", conf.GetName(), conf.GetENV()), conf.GetTraceConfig().Endpoint, conf.GetTraceConfig().Ratio)
 	sentry.Init()
 	grpc.Init()
+	server.InitApi()
 	server.InitServer()
 }
