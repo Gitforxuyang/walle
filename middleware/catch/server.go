@@ -58,6 +58,7 @@ func RpcServerCatch() gin.HandlerFunc {
 }
 
 func catch(ctx *gin.Context, log logger.EvaLogger) {
+	ctx.Header("traceId", util.GetTraceId(ctx))
 	if e := recover(); e != nil {
 		ctx.Set("err", error2.PanicError)
 		log.Error(ctx, "发生panic", logger.Fields{"e": e})

@@ -36,8 +36,15 @@ func InitServer() {
 		Use(log.ServerLogger()).
 		Use(catch.RpcServerCatch()).
 		POST("/:Service/:Method", func(ctx *gin.Context) {
-			//m := ctx.GetStringMap("req")
-			ctx.Set("resp", map[string]string{"code": "123"})
+			req, _ := ctx.Get("req")
+			resp, err := Rpc(ctx, ctx.Param("Service"), ctx.Param("Method"), req)
+			if err != nil {
+				ctx.Set("status", 500)
+				ctx.Set("err", err)
+			} else {
+				ctx.Set("status", 200)
+				ctx.Set("resp", resp)
+			}
 		})
 
 	r.

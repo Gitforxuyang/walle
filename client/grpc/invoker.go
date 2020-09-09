@@ -71,7 +71,7 @@ func (p *Proxy) Invoke(ctx context.Context,
 
 	outputMsg, err := p.stub.InvokeRPC(ctx, invocation, md)
 	if err != nil {
-		return nil, err
+		return nil, error2.DecodeStatus(err)
 	}
 	m, err := outputMsg.MarshalJSON()
 	if err != nil {
@@ -81,7 +81,7 @@ func (p *Proxy) Invoke(ctx context.Context,
 }
 
 func NewProxy(service string) *Proxy {
-	conn, err := grpc.Dial(":50001",
+	conn, err := grpc.Dial("",
 		grpc.WithInsecure(),
 		grpc.WithBlock(),
 		grpc.WithBalancer(grpc.RoundRobin(etcd2.NewResolver(service))),

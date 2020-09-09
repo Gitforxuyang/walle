@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/Gitforxuyang/walle/client/grpc"
 	"github.com/Gitforxuyang/walle/config"
 	"github.com/Gitforxuyang/walle/server"
 	"github.com/Gitforxuyang/walle/util/logger"
@@ -15,5 +16,6 @@ func main() {
 	logger.Init(conf.GetName())
 	trace.Init(fmt.Sprintf("%s_%s", conf.GetName(), conf.GetENV()), conf.GetTraceConfig().Endpoint, conf.GetTraceConfig().Ratio)
 	sentry.Init()
+	grpc.Init()
 	server.InitServer()
 }

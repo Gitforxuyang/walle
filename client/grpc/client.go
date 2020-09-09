@@ -19,6 +19,7 @@ var (
 type Service struct {
 	Package string            `json:"package"`
 	Name    string            `json:"name"`
+	AppId   string            `json:"appId"`
 	Methods map[string]Method `json:"methods"`
 }
 type Method struct {
@@ -40,12 +41,19 @@ func Init() {
 			service := Service{}
 			err := utils.JsonToStruct(string(v.Value), &service)
 			utils.Must(err)
-			proxy := NewProxy(service.Name)
+			proxy := NewProxy(service.AppId)
 			invokers[service.Name] = proxy
 			services[service.Name] = &service
 		}
 		go watch()
 	})
+}
+func GetProxy(service string) *Proxy {
+	return invokers[service]
+}
+
+func GetService(service string) *Service {
+	return services[service]
 }
 
 func watch() {

@@ -17,7 +17,7 @@ func main() {
 	trace2.Init(fmt.Sprintf("%s_%s", conf.GetName(), conf.GetENV()), conf.GetTraceConfig().Endpoint, conf.GetTraceConfig().Ratio)
 	proxy := grpc2.NewTestProxy()
 	md := make(metadata.Metadata)
-	resp, err := proxy.Invoke(context.TODO(), "hello.SayHelloService", "Hello", []byte(`{"name1":"dynamic","age":"123"}`), &md)
+	resp, err := proxy.Invoke(context.TODO(), "hello.SayHelloService", "Hello", []byte(`{"name1":"dynamic","age":"123","data":{"d1":"d1"},"strs":["s1","s2"]}`), &md)
 	if err != nil {
 		panic(err)
 	}
