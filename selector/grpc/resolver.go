@@ -12,8 +12,7 @@ import (
 
 const (
 	//服务注册前缀
-	ETCD_SERVICE_PREFIX       = "/eva/service/"
-	ETCD_WALLE_SERVICE_PREFIX = "/eva/walle/service/"
+	ETCD_SERVICE_PREFIX = "/eva/service/"
 )
 
 type ServiceNode struct {

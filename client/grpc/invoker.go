@@ -2,13 +2,22 @@ package grpc
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"github.com/Gitforxuyang/walle/middleware/catch"
+	"github.com/Gitforxuyang/walle/middleware/log"
+	"github.com/Gitforxuyang/walle/middleware/trace"
+	etcd2 "github.com/Gitforxuyang/walle/selector/grpc"
+	error2 "github.com/Gitforxuyang/walle/util/error"
+	"github.com/Gitforxuyang/walle/util/utils"
 	"github.com/fullstorydev/grpcurl"
 	"github.com/gdong42/grpc-mate/metadata"
 	"github.com/gdong42/grpc-mate/proxy/reflection"
 	"github.com/gdong42/grpc-mate/proxy/stub"
+	"github.com/jhump/protoreflect/dynamic/grpcdynamic"
+	"github.com/jhump/protoreflect/grpcreflect"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
+	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
+	"time"
 )
 
 type Proxy struct {
@@ -18,6 +27,38 @@ type Proxy struct {
 	descSource grpcurl.DescriptorSource
 }
 
+func NewTestProxy() *Proxy {
+	conn, err := grpc.Dial(":50001",
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+		//grpc.WithBalancer(grpc.RoundRobin(etcd.NewResolver(""))),
+		//grpc.WithKeepaliveParams(
+		//	keepalive.ClientParameters{
+		//		Time:                time.Second * 10,
+		//		Timeout:             time.Second * 1,
+		//		PermitWithoutStream: true,
+		//	}),
+		grpc.WithChainUnaryInterceptor(
+			trace.NewClientWrapper(),
+			log.NewClientWrapper(),
+			catch.NewClientWrapper(5),
+		),
+	)
+	if err != nil {
+		panic(err)
+	}
+	ctx := context.TODO()
+	rc := grpcreflect.NewClient(ctx, grpc_reflection_v1alpha.NewServerReflectionClient(conn))
+
+	proxy := &Proxy{
+		cc:         conn,
+		reflector:  reflection.NewReflector(rc),
+		stub:       stub.NewStub(grpcdynamic.NewStub(conn)),
+		descSource: grpcurl.DescriptorSourceFromServer(ctx, rc),
+	}
+	return proxy
+}
+
 func (p *Proxy) Invoke(ctx context.Context,
 	serviceName, methodName string,
 	message []byte,
@@ -25,8 +66,7 @@ func (p *Proxy) Invoke(ctx context.Context,
 ) ([]byte, error) {
 	invocation, err := p.reflector.CreateInvocation(serviceName, methodName, message)
 	if err != nil {
-		fmt.Println("123123")
-		//return nil, err
+		return nil, error2.GRpcError.SetDetail(err.Error())
 	}
 
 	outputMsg, err := p.stub.InvokeRPC(ctx, invocation, md)
@@ -35,7 +75,36 @@ func (p *Proxy) Invoke(ctx context.Context,
 	}
 	m, err := outputMsg.MarshalJSON()
 	if err != nil {
-		return nil, errors.New("failed to marshal output JSON")
+		return nil, error2.GRpcError.SetDetail(err.Error())
 	}
 	return m, err
+}
+
+func NewProxy(service string) *Proxy {
+	conn, err := grpc.Dial(":50001",
+		grpc.WithInsecure(),
+		grpc.WithBlock(),
+		grpc.WithBalancer(grpc.RoundRobin(etcd2.NewResolver(service))),
+		grpc.WithKeepaliveParams(
+			keepalive.ClientParameters{
+				Time:                time.Second * 10,
+				Timeout:             time.Second * 1,
+				PermitWithoutStream: true,
+			}),
+		grpc.WithChainUnaryInterceptor(
+			trace.NewClientWrapper(),
+			log.NewClientWrapper(),
+			catch.NewClientWrapper(5),
+		),
+	)
+	utils.Must(err)
+	ctx := context.TODO()
+	rc := grpcreflect.NewClient(ctx, grpc_reflection_v1alpha.NewServerReflectionClient(conn))
+	proxy := &Proxy{
+		cc:         conn,
+		reflector:  reflection.NewReflector(rc),
+		stub:       stub.NewStub(grpcdynamic.NewStub(conn)),
+		descSource: grpcurl.DescriptorSourceFromServer(ctx, rc),
+	}
+	return proxy
 }

@@ -18,7 +18,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
 	"testing"
-	"time"
 )
 
 func TestMain(m *testing.M) {
@@ -54,10 +53,9 @@ func TestMain(m *testing.M) {
 		descSource: grpcurl.DescriptorSourceFromServer(ctx, rc),
 	}
 	md := make(metadata.Metadata)
-	resp, err := proxy.Invoke(ctx, "hello.SayHelloService", "Hello", []byte(`{"name":"dynamic","age":123}`), &md)
+	resp, err := proxy.Invoke(ctx, "hello.SayHelloService", "Hello", []byte(`{"name":"dynamic","age":"abc"}`), &md)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Print(string(resp))
-	time.Sleep(time.Second * 3)
 }

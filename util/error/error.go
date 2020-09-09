@@ -37,6 +37,12 @@ var (
 		Message: "context已到期",
 		Status:  codes.DeadlineExceeded,
 	}
+	GRpcError = EvaError{
+		AppId:   "walle",
+		Code:    5001,
+		Message: "内部错误",
+		Status:  codes.Internal,
+	}
 )
 
 type EvaError struct {
