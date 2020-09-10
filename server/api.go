@@ -28,8 +28,8 @@ type Method struct {
 }
 
 type Plugin struct {
-	Name  string   `json:"name"`
-	Param []string `json:"param"`
+	Name  string `json:"name"`
+	Param string `json:"param"`
 }
 
 var (
