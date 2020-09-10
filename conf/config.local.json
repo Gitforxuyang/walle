@@ -1,4 +1,16 @@
 
 {
-  "etcd": ["0.0.0.0:2379"]
+  "etcd": ["0.0.0.0:2379"],
+  "redis": {
+    "walle": {
+      "addr": "192.168.3.3:6379",
+      "password": "",
+      "DB": 0,
+      "PoolSize": 20,
+      "MinIdleConns": 20,
+      "DialTimeout": 5,
+      "ReadTimeout": 3,
+      "WriteTimeout": 3
+    }
+  }
 }

@@ -39,6 +39,16 @@ type LogConfig struct {
 	HttpClient bool   //http客户端日志
 	Level      string //日志打印级别
 }
+type RedisConfig struct {
+	Addr         string
+	Password     string
+	DB           int
+	PoolSize     int
+	MinIdleConns int
+	DialTimeout  time.Duration
+	ReadTimeout  time.Duration
+	WriteTimeout time.Duration
+}
 type EvaConfig struct {
 	name              string
 	port              int32
@@ -52,6 +62,7 @@ type EvaConfig struct {
 	trace             *TraceConfig
 	etcd              []string
 	sentryDSN         string
+	redis             map[string]*RedisConfig
 }
 
 var (
@@ -66,6 +77,7 @@ func Init() {
 		config.config = make(map[string]interface{})
 		config.changeNotifyFuncs = make([]ChangeNotify, 0)
 		config.grpc = make(map[string]*GRpcClientConfig)
+		config.redis = make(map[string]*RedisConfig)
 		config.trace = &TraceConfig{}
 		config.log = &LogConfig{Server: false, GRpcClient: false, HttpClient: false, Level: "INFO"}
 		config.etcd = make([]string, 0, 3)
@@ -123,6 +135,8 @@ func Init() {
 		err = v.UnmarshalKey("log", &config.log)
 		utils.Must(err)
 		err = v.UnmarshalKey("http", &config.http)
+		utils.Must(err)
+		err = v.UnmarshalKey("redis", &config.redis)
 		utils.Must(err)
 		if utils.IsNil(v.Get("trace")) {
 			panic("trace设置不能为空")
@@ -200,3 +214,10 @@ func GetSentry() string {
 //func GetDynamic() map[string]interface{} {
 //	return config.dynamic
 //}
+func (m *EvaConfig) GetRedis(name string) *RedisConfig {
+	c := m.redis[strings.ToLower(name)]
+	if c == nil {
+		panic(fmt.Sprintf("redis：%s配置未找到", name))
+	}
+	return c
+}
