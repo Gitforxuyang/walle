@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"github.com/Gitforxuyang/walle/config"
+	"github.com/Gitforxuyang/walle/util/logger"
 	"github.com/Gitforxuyang/walle/util/utils"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/mvcc/mvccpb"
@@ -65,7 +66,11 @@ func watch() {
 				case mvccpb.PUT:
 					service := Service{}
 					err := utils.JsonToStruct(string(event.Kv.Value), &service)
-					utils.Must(err)
+					if err != nil {
+						logger.GetLogger().Error(context.TODO(), "监听服务描述信息变化报错",
+							logger.Fields{"err": err, "value": string(event.Kv.Value)})
+						continue
+					}
 					if invokers[service.Name] == nil {
 						proxy := NewProxy(service.Name)
 						invokers[service.Name] = proxy
