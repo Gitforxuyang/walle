@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/Gitforxuyang/walle/config"
+	"github.com/Gitforxuyang/walle/util/logger"
 	"github.com/Gitforxuyang/walle/util/utils"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/mvcc/mvccpb"
@@ -72,7 +73,11 @@ func (w *watcher) Next() ([]*naming.Update, error) {
 		for _, ev := range wresp.Events {
 			node := ServiceNode{}
 			err := utils.JsonToStruct(string(ev.Kv.Value), &node)
-			utils.Must(err)
+			if err != nil {
+				logger.GetLogger().Error(context.TODO(), "grpc client watch错误",
+					logger.Fields{"err": err})
+				continue
+			}
 			switch ev.Type {
 			case mvccpb.PUT:
 				return []*naming.Update{{Op: naming.Add, Addr: node.Endpoint}}, nil

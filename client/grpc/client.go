@@ -23,10 +23,9 @@ type Service struct {
 	Methods map[string]Method `json:"methods"`
 }
 type Method struct {
-	Req  Message `json:"req"`
-	Resp Message `json:"resp"`
+	Req  map[string]string `json:"req"`
+	Resp map[string]string `json:"resp"`
 }
-type Message map[string]string
 
 const (
 	ETCD_WALLE_SERVICE_PREFIX = "/eva/walle/service/"
@@ -70,6 +69,8 @@ func watch() {
 					if invokers[service.Name] == nil {
 						proxy := NewProxy(service.Name)
 						invokers[service.Name] = proxy
+					} else {
+						invokers[service.Name].reflector.RefreshDesc(service.Name)
 					}
 					services[service.Name] = &service
 				case mvccpb.DELETE:

@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	cloud.google.com/go/storage v1.11.0 // indirect
-	github.com/Gitforxuyang/protoreflect v1.2.3
+	github.com/Gitforxuyang/protoreflect v1.3.0
 	github.com/cncf/udpa/go v0.0.0-20200903234907-e9e5d2bce62f // indirect
 	github.com/coreos/etcd v3.3.22+incompatible
 	github.com/envoyproxy/go-control-plane v0.9.6 // indirect

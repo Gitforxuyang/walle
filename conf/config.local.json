@@ -3,7 +3,7 @@
   "etcd": ["0.0.0.0:2379"],
   "redis": {
     "walle": {
-      "addr": "192.168.3.3:6379",
+      "addr": "localhost:6379",
       "password": "",
       "DB": 0,
       "PoolSize": 20,

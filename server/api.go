@@ -111,9 +111,9 @@ func refreshApi() {
 		}
 		api.apis[k] = &m
 	}
-	logger.GetLogger().Info(context.TODO(), "刷新api成功", logger.Fields{
-		"api": api.apis,
-	})
+	//logger.GetLogger().Info(context.TODO(), "刷新api成功", logger.Fields{
+	//	"api": api.apis,
+	//})
 }
 func watch() {
 	etcd := config.GetEtcdClient()

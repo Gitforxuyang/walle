@@ -13,7 +13,7 @@ import (
 	"github.com/Gitforxuyang/walle/middleware/trace"
 	etcd2 "github.com/Gitforxuyang/walle/selector/grpc"
 	error2 "github.com/Gitforxuyang/walle/util/error"
-	"github.com/Gitforxuyang/walle/util/utils"
+	"github.com/Gitforxuyang/walle/util/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection/grpc_reflection_v1alpha"
@@ -97,8 +97,12 @@ func NewProxy(service string) *Proxy {
 			catch.NewClientWrapper(5),
 		),
 	)
-	utils.Must(err)
 	ctx := context.TODO()
+	if err != nil {
+		logger.GetLogger().Error(ctx, "newProxy失败", logger.Fields{
+			"err": err,
+		})
+	}
 	rc := grpcreflect.NewClient(ctx, grpc_reflection_v1alpha.NewServerReflectionClient(conn))
 	proxy := &Proxy{
 		cc:         conn,
