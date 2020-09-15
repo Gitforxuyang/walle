@@ -8,7 +8,6 @@ import (
 	"github.com/Gitforxuyang/walle/util/utils"
 	"github.com/coreos/etcd/clientv3"
 	"sync"
-	"time"
 )
 
 const (
@@ -35,12 +34,7 @@ func GetClient() *clientv3.Client {
 }
 func Init() {
 	etcdOnce.Do(func() {
-		var err error
-		client, err = clientv3.New(clientv3.Config{
-			Endpoints:   config.GetConfig().GetEtcd(),
-			DialTimeout: time.Second * 3,
-		})
-		utils.Must(err)
+		client = config.GetEtcdClient()
 	})
 }
 
